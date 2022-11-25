@@ -1,0 +1,53 @@
+.view-container {
+    width: 100%;
+    min-height: 100vh;
+    height: 100vh;
+}
+
+.view-contents {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 1140px;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+}
+
+.view-box {
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    font-size: 30px;
+    margin-bottom: 18px;
+    text-align: center;
+}
+
+.sub-title {
+    margin-bottom: 5px;
+}
+
+.view-box>input {
+    box-sizing: border-box;
+    border: 1px solid #707070;
+    border-radius: 5px;
+    width: 448px;
+    height: 56px;
+    margin-bottom: 18px;
+    padding: 10px;
+    cursor: pointer;
+}
+
+
+.view-box>button {
+    width: 448px;
+    height: 56px;
+    margin-bottom: 18px;
+    border: none;
+    display: block;
+    font-size: 17px;
+    color: #fff;
+    background-color: #003580;
+}

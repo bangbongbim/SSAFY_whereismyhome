@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mycom.myapp.user.dao.UserDao"> <!-- !Mapper annotation 있는 dao -->
+
+
+	<insert id="userRegister"
+		parameterType="com.mycom.myapp.user.dto.UserDto">
+		insert into users (
+		user_name, user_password, user_email,
+		user_profile_image_url,
+		user_register_date, user_clsf )
+		values ( #{userName},
+		#{userPassword},
+		#{userEmail},'' , now(), '001' )
+	</insert>
+
+	<select id="userLogin" parameterType="string"
+		resultType="com.mycom.myapp.user.dto.UserDto">
+		select user_seq, user_name, user_password, user_email,
+		user_profile_image_url, user_register_date, user_clsf
+		from users
+		where user_email = #{userEmail}
+	</select>
+
+	<update id="userModify"
+		parameterType="com.mycom.myapp.user.dto.UserDto">
+		update users
+		set user_name=#{userName},
+		user_password=#{userPassword},user_email=#{userEmail}
+		where
+		user_seq=#{userSeq}
+	</update>
+
+	<delete id="userDelete" parameterType="int">
+		delete from users where user_seq=#{userSeq}
+	</delete>
+
+</mapper>

@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- kakao -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=ac9eedff848a7c184a6a6818246bf6a5&libraries=services"></script>
+
+    <!-- bootstrap-->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"
+      integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js"
+      integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Alertify -->
+    <!-- JavaScript -->
+    <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
+    <!-- CSS -->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/alertify.min.css" />
+    <!-- Default theme -->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/default.min.css" />
+    <!-- Semantic UI theme -->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/semantic.min.css" />
+    <!-- Bootstrap theme -->
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/css/themes/bootstrap.min.css" />
+
+    <!--custom -->
+    <link href="../css/basic.css" rel="stylesheet" />
+    <link href="../css/deal.css" rel="stylesheet" />
+    <title>Document</title>
+  </head>
+
+  <body>
+    <!--navbar 시작-->
+    <div id="container">
+      <nav class="navbar navbar-expand-lg navbar-light bg-black">
+        <div class="container-fluid">
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarTogglerDemo01"
+            aria-controls="navbarTogglerDemo01"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
+            <a class="navbar-brand" href="/" style="color: white">구해줘 홈즈</a>
+
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+              <li class="nav-item">
+                <a class="nav-link" style="color: white" href="#">공지사항</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" style="color: white" href="#">오늘의 뉴스</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </div>
+    <!--navbar 끝-->
+
+    <div class="selection_container d-flex justify-content-evenly align-items-center p-3">
+      <!-- 주소 선택 시작-->
+      <select id="sido" class="form-select" aria-label="Default select example">
+        <option selected value="">도/광역시</option>
+        <option value="서울특별시">서울특별시</option>
+      </select>
+      <select id="gugun" class="form-select" aria-label="Default select example">
+        <option selected value="">시/구/군</option>
+      </select>
+      <select id="dong" class="form-select" aria-label="Default select example">
+        <option selected value="">동</option>
+      </select>
+      <button class="btn btn-success search-btn" type="button" id="search-btn">검색</button>
+      <!-- 주소 선택 끝-->
+    </div>
+    <div id="map"></div>
+
+    <section>
+      <!-- 전체 페이지 -->
+      <div class="deal-info-container">
+        <div class="deal-info-list">
+          <div id="deal-info-container-title">거래 정보</div>
+          <div class="deal-info-list-elem"></div>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div id="paginationWrapper"></div>
+      </div>
+
+      <!-- 상세 페이지 -->
+      <div class="deal-info-container detail-info-container" style="display: none"></div>
+    </section>
+
+    <script type="text/javascript" src="../js/util.js"></script>
+
+    <script>
+      var OFFSET = 0;
+
+      var LIST_ROW_COUNT = 10; // 한페이지에 보여줄 페이지 수 ; 백엔드의 limit에 해당
+      var PAGE_LINK_COUNT = 5; // pagination link를 몇개 만들건지
+      var TOTAL_LIST_ITEM_COUNT = 0; // 총 건수
+      var CURRENT_PAGE_INDEX = 1;
+
+      window.onload = function () {
+        document.querySelector("#search-btn").onclick = function () {
+          // console.log("push search button");
+          if (validateHouseListByDong()) {
+            houseListByDong();
+          } else {
+          }
+        };
+        // 도시 선택하면 시/구/군 options를 초기화하기
+        document.querySelector("#sido").onchange = function () {
+          document.querySelector("#gugun").innerHTML = '<option selected value="">시/구/군</option>';
+          document.querySelector("#dong").innerHTML = '<option selected value="">동</option>';
+          // 시/구/군 리스트 가져오기
+          let sidoName = document.querySelector("#sido").value;
+          gugunList(sidoName);
+        };
+        // 시/구/군 선택하면 동 options를 초기화하기
+        document.querySelector("#gugun").onchange = function () {
+          document.querySelector("#dong").innerHTML = '<option selected value="">동</option>';
+          // 시/구/군 리스트 가져오기
+          let dongName = document.querySelector("#gugun").value;
+          dongList(dongName);
+        };
+      };
+
+      /////////////////////////////////////////////
+      ////////////////////// 법명동으로 아파트 정보 찾기 //////
+      function validateHouseListByDong() {
+        let sido = document.querySelector("#sido").value;
+        let gugun = document.querySelector("#gugun").value;
+        let dong = document.querySelector("#dong").value;
+        if (sido.length == 0) {
+          alertify.warning("도/광역시를 선택해주세요.");
+          return false;
+        } else if (gugun.length == 0) {
+          alertify.warning("도/구/군을 선택해주세요.");
+          return false;
+        } else if (dong.length == 0) {
+          alertify.warning("동을 선택해주세요.");
+          return false;
+        }
+        return true;
+      }
+
+      /** 법명동 아파트 조회 리스트 */
+      async function houseListByDong() {
+        let sido = document.querySelector("#sido").value;
+        let gugun = document.querySelector("#gugun").value;
+        let dong = document.querySelector("#dong").value;
+
+        let url = "../house/dong";
+        let urlParams = `?dong=${dong}&limit=${LIST_ROW_COUNT}&offset=${OFFSET}`;
+
+        try {
+          let response = await fetch(url + urlParams);
+          let data = await response.json();
+          // console.log(data);
+          makeHouseListByDongHtml(data);
+          // 페이지네이션
+          houseDealByDongTotalCnt(dong);
+        } catch (error) {
+          console.log(error);
+          alertify.error("글 조회 과정에서 문제가 생겼습니다.");
+        }
+      }
+
+      function makeHouseListByDongHtml(data) {
+        let dealInfoList = document.querySelector(".deal-info-list-elem");
+        let innerList = ``;
+        if (data.length == 0) {
+          innerList = `
+          <hr>
+          <div class="d-flex justify-content-center align-content-center">
+            <div>검색 결과가 없어요</div>
+          </div>
+          `;
+        } else {
+          data.forEach((info) => {
+            // console.log(info);
+            let no = info.no;
+            let dong = info.dong;
+            let aptName = info.aptName;
+            let code = info.code;
+            let dealAmount = info.dealAmount.trim();
+            let buildYear = info.buildYear;
+            let dealYear = info.dealYear;
+            let dealMonth = info.dealMonth;
+            let dealDay = info.dealDay;
+            let area = info.area;
+            let floor = info.floor;
+            let jibun = info.jibun;
+            let houseNo = info.houseNo;
+
+            let dealDate = makeDateStr(dealYear, dealMonth, dealDay, "/");
+            let divId = "deal" + no;
+            innerList += `
+                  <hr>  
+                  <div id="${divId}" data-no=${no} class="deal-info" detail-toggle="off">
+                      <div class="name">${aptName}</div>
+                      <div class="cost">거래금액 : ${dealAmount}만원</div>
+                      <div class="area">면적 : ${area}</div>
+                      <div class="date">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-calendar3 date-icon" viewBox="0 0 16 16">
+                          <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
+                          <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                          </svg>
+                      ${dealDate}</div>
+                  </div>
+                `;
+          });
+        }
+        dealInfoList.innerHTML = innerList;
+
+        /** 상세 조회 이벤트 등록*/
+        makeHouseDetailHtmlEventHandler();
+      }
+
+      /////////////////////////////////// 페이지네이션
+      /** 법정동으로 검색한 아파트 거래 정보 리스트 총 개수 */
+      async function houseDealByDongTotalCnt(dong) {
+        let url = "../house/dong/total";
+        let urlParams = `?dong=${dong}`;
+
+        try {
+          let response = await fetch(url + urlParams);
+          let data = await response.json();
+          // console.log(data);
+          TOTAL_LIST_ITEM_COUNT = data.totalCnt;
+          makePaginationHtml(LIST_ROW_COUNT, PAGE_LINK_COUNT, CURRENT_PAGE_INDEX, TOTAL_LIST_ITEM_COUNT, "paginationWrapper"); // util.js에 있음
+        } catch (error) {
+          // js에서는 이렇게 error를 받아오나보다!
+          console.log(error);
+          alertify.error("글 조회 과정에서 문제가 생겼습니다.");
+        }
+      }
+
+      /** 페이지를 옮겼을 때, 해당 페이지에 있는 게시글 목록을 보여준다.
+       * util.js의 makePaginationHtml() 에서 호출됨
+       */
+      function movePage(pageIndex) {
+        OFFSET = (pageIndex - 1) * LIST_ROW_COUNT; // 현재 페이지 인덱스 전까지는 다 뛰어넘음
+        CURRENT_PAGE_INDEX = pageIndex;
+        houseListByDong(); // 바뀐 페이지를 다시 보여줌
+      }
+
+      /////카카오 관련 시작//////
+      // 마커를 클릭하면 장소명을 표출할 인포윈도우 입니다
+      var infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
+
+      /* 카카오맵 */
+      var mapContainer = document.getElementById("map"), // 지도를 표시할 div
+        mapOption = {
+          center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
+          level: 3, // 지도의 확대 레벨
+        };
+
+      // 지도를 표시할 div와  지도 옵션으로  지도를 생성합니다
+      var map = new kakao.maps.Map(mapContainer, mapOption);
+
+      // 지도 확대 축소를 제어할 수 있는  줌 컨트롤을 생성합니다
+      var zoomControl = new kakao.maps.ZoomControl();
+      map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+      // 주소-좌표 변환 객체를 생성합니다
+      var geocoder = new kakao.maps.services.Geocoder();
+
+      // 인포윈도우를 표시하는 클로저를 만드는 함수입니다
+      function makeOverListener(map, marker, infowindow) {
+        return function () {
+          infowindow.open(map, marker);
+        };
+      }
+
+      // 인포윈도우를 닫는 클로저를 만드는 함수입니다
+      function makeOutListener(infowindow) {
+        return function () {
+          infowindow.close();
+        };
+      }
+
+      ///////////////////////////////////////////////////////
+      function markInMap(lat, lng, aptName) {
+        console.log("좌표", lat, lng);
+        if (marker != null) {
+          marker.setMap(null); // 이전 마커를 없앰
+        }
+
+        var coords = new kakao.maps.LatLng(lat, lng);
+
+        // 결과값으로 받은 위치를 마커로 표시합니다
+        var marker = new kakao.maps.Marker({
+          map: map,
+          position: coords,
+        });
+
+        // 인포윈도우로 장소에 대한 설명을 표시합니다
+        var infowindow = new kakao.maps.InfoWindow({
+          content: `<h5 style="font-weight:600;text-align:center;">${aptName}</h5>`,
+        });
+
+        // 마커에 mouseover 이벤트와 mouseout 이벤트를 등록합니다
+        // 이벤트 리스너로는 클로저를 만들어 등록합니다
+        // for문에서 클로저를 만들어 주지 않으면 마지막 마커에만 이벤트가 등록됩니다
+        kakao.maps.event.addListener(marker, "mouseover", makeOverListener(map, marker, infowindow));
+        kakao.maps.event.addListener(marker, "mouseout", makeOutListener(infowindow));
+        // 지도의 중심을 결과값으로 받은 위치로 이동시킵니다
+        marker.setMap(map);
+        map.setCenter(coords);
+      }
+
+      ////////카카오 관련 끝///////
+
+      ////// select ////////
+      /** 시/구/군 option 리스트 가져오기*/
+      async function gugunList(sidoName) {
+        let url = `../region/gugun/${sidoName}`;
+
+        try {
+          let response = await fetch(url);
+          let data = await response.json();
+          makeGugunListHtml(data);
+        } catch (error) {
+          console.log(error);
+          alertify.error("시/구/군 목록을 조회하는 과정에서 오류가 발생하였습니다.");
+        }
+      }
+
+      function makeGugunListHtml(data) {
+        let optionsHTML = `<option selected value="">시/구/군</option>`;
+        data.forEach((gugun) => {
+          let gugunName = gugun.name;
+          optionsHTML += `<option value="${gugunName}">${gugunName}</option>`;
+        });
+        let gugunSelect = document.querySelector("#gugun");
+        gugunSelect.innerHTML = optionsHTML;
+      }
+
+      /** 법정동 option 리스트 가져오기*/
+      async function dongList(gugunName) {
+        let url = `../region/dong/${gugunName}`;
+
+        try {
+          let response = await fetch(url);
+          let data = await response.json();
+
+          makeDongListHtml(data);
+        } catch (error) {
+          console.log(error);
+          alertify.error("동 목록을 조회하는 과정에서 오류가 발생하였습니다.");
+        }
+      }
+
+      function makeDongListHtml(data) {
+        let optionsHTML = `<option selected value="">동</option>`;
+        data.forEach((dong) => {
+          let dongName = dong.name;
+          optionsHTML += `<option value="${dongName}">${dongName}</option>`;
+        });
+        let dongSelect = document.querySelector("#dong");
+        dongSelect.innerHTML = optionsHTML;
+      }
+      //////select 끝/////
+
+      ///////detail 시작/////
+      async function getInfo() {
+        let response = await fetch("../user");
+        let data = await response.json(); //==Json.parse();
+
+        if (data.result == "success") {
+          console.log("로그인 상태");
+          //내정보에 정보 넣기
+          let myUserClsf = data.userClsf;
+          return myUserClsf;
+          //버튼 보이기
+        } else if (data.result == "fail") {
+          console.log("비로그인 상태");
+          //버튼숨기기
+        }
+      }
+
+      //////// 상세 조회 /////////
+
+      /** 법명동 아파트 상세 조회 - 이벤트 등록 */
+      function makeHouseDetailHtmlEventHandler() {
+        document.querySelectorAll(".deal-info").forEach((el) => {
+          el.onclick = function () {
+            let no = this.getAttribute("data-no");
+            console.log("click", no);
+            houseDetail(no);
+          };
+        });
+      }
+
+      async function nearbyMarketList(guName) {
+        let pageNo = 1;
+        let offset = 100; // 페이지네이션 안함. 모든 병원 정보 다 가져옴.
+        let url = "../market";
+        let urlParams = `?pageNo=${pageNo}&offset=${offset}&guName=${guName}`;
+
+        try {
+          let response = await fetch(url + urlParams);
+          let data = await response.json();
+          console.log("market info: ", data);
+
+          return data;
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      async function houseDetail(no) {
+        let url = `../house/${no}`;
+
+        try {
+          let response = await fetch(url);
+          let data = await response.json();
+          console.log("detail info : " + data);
+
+          let marketData = await nearbyMarketList(data.gugunName);
+          let userClsf = await getInfo(); // 회원 유형 - 준회원만 시장 정보 표시
+
+          makeHouseDetailHtml(data, marketData, userClsf); // 상세 조회 페이지 표시
+
+          // 모달 닫기 버튼
+          let closeBtn = document.querySelector(".btn-close");
+          closeBtn.addEventListener("click", function () {
+            let detailInfo = document.querySelector(".detail-info-container");
+            detailInfo.setAttribute("style", "display:none;");
+          });
+        } catch (error) {
+          console.log(error);
+          alertify.error("상세 정보 조회 과정에서 문제가 생겼습니다.");
+        }
+      }
+
+      function makeHouseDetailHtml(data, marketDataList, userClsf) {
+        let no = data.no;
+        let lat = data.lat;
+        let lng = data.lng;
+        let houseNo = data.houseNo;
+        console.log("In DetailHtml 좌표 ", lat, lng);
+        /** 아파트 정보 */
+        let dong = data.dong;
+        let cityName = data.cityName;
+        let gugunName = data.gugunName;
+        let aptName = data.aptName;
+        let address = cityName + " " + gugunName + " " + dong + " " + aptName;
+        let jibun = data.jibun;
+        let code = data.code;
+        let buildYear = data.buildYear;
+        let area = data.area;
+        let floor = data.floor;
+
+        /** 거래 정보 */
+        let dealYear = data.dealYear;
+        let dealMonth = data.dealMonth;
+        let dealDay = data.dealDay;
+        let dealAmount = data.dealAmount;
+        let dealDate = makeDateStr(dealYear, dealMonth, dealDay, "/");
+
+        /** 아파트 거래 정보 HTML */
+        let apartInfo = [
+          { name: "주소", value: address },
+          { name: "지번", value: jibun },
+          { name: "건축연도", value: buildYear + "년" },
+          { name: "면적", value: area },
+          { name: "층수", value: floor + " 층" },
+          { name: "거래 금액", value: dealAmount + " 만원" },
+          {
+            name: "거래 날짜",
+            value: `<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-calendar3 date-icon" viewBox="0 0 16 16">
+                        <path d="M14 0H2a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zM1 3.857C1 3.384 1.448 3 2 3h12c.552 0 1 .384 1 .857v10.286c0 .473-.448.857-1 .857H2c-.552 0-1-.384-1-.857V3.857z"/>
+                        <path d="M6.5 7a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-9 3a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm3 0a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/>
+                        </svg>${dealDate}`,
+          },
+        ];
+        let apartInfoHtml = ``;
+        apartInfo.forEach((info) => {
+          apartInfoHtml += `
+            <span class="list-group-item list-group-item-action" aria-current="true">
+                <div class="fs-5 fw-bolder mb-1">${info.name}</div>
+                <small class="ps-2 mb-1 text-muted">${info.value}</small>
+            </span>
+        `;
+        });
+
+        /** 근처 전통시장 상권 정보 HTML */
+        let marketHTML = ``;
+        marketDataList.forEach((marketData) => {
+          let mName = marketData.mName;
+          let guName = marketData.guName;
+          let mAddr = marketData.mAddr;
+          let mLat = marketData.lat;
+          let mLng = marketData.lng;
+          console.log(marketData);
+          let marketInfo = [{ name: mName, value: mAddr }];
+          marketInfo.forEach((info) => {
+            marketHTML += `
+              <span class="list-group-item list-group-item-action" aria-current="true">
+                  <div class="fs-5 fw-bolder mb-1">${info.name}</div>
+                  <small class="ps-2 mb-1 text-muted">${info.value}</small>
+              </span>
+          `;
+          });
+        });
+
+        /** 상세 조회 화면이 나타나는 이벤트 */
+        let detailInfo = document.querySelector(".detail-info-container");
+        detailInfo.setAttribute("style", "display: flex; flex-direction: column;");
+        let detailInfoHTML =
+          `
+        <div class="d-flex justify-content-between align-items-center nav-tabs" >
+            <!-- 탭 -->
+            <div class="nav" id="nav-tab" role="tablist">
+                <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home" 
+                        type="button" role="tab" aria-controls="nav-home" aria-selected="true">거래 정보</button>
+                <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" 
+                        type="button" role="tab" aria-controls="nav-profile" aria-selected="false">근처 시장 상권</button>
+            </div>
+            <!-- 닫기 버튼 -->
+            <div class="px-2">
+                <button type="button" class="btn-close" aria-label="Close"></button>
+            </div>
+        </div>
+        <!-- 탭 내용 -->
+        <div class="flex-grow tab-content overflow-auto" id="nav-tabContent">
+            <!-- 아파트 정보 -->
+            <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+            ` +
+          apartInfoHtml +
+          `
+            </div>
+            <!-- 전통 시장 정보 -->
+            <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+              `;
+        console.log("userClsf", userClsf);
+        if (userClsf === "002" || userClsf === "003") {
+          detailInfoHTML += marketHTML;
+        } else {
+          detailInfoHTML += `
+              <span class="list-group-item list-group-item-action" aria-current="true">
+                  <small class="ps-2 mb-1 text-muted">준회원 이상만 볼 수 있는 정보입니다.</small>
+              </span>`;
+        }
+        detailInfoHTML += `
+            </div>
+                        
+        </div>
+
+      `;
+        detailInfo.innerHTML = detailInfoHTML;
+
+        // 지도에 표시
+        markInMap(lat, lng, aptName);
+      }
+      //detail 끝@@
+    </script>
+  </body>
+</html>

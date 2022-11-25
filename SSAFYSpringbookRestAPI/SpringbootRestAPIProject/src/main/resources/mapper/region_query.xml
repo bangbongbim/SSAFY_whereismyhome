@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mycom.myapp.region.dao.RegionDao"> <!-- !Mapper annotation 있는 dao -->
+
+	<select id="findGugunCodeList" parameterType="string" resultType="com.mycom.myapp.info.dto.GugunCodeDto">
+		select g.name 
+		  from gugun_code g, sido_code s  
+		where g.sido_code = s.code and s.name = #{cityName}
+	</select>
+	
+	<select id="findDongCodeList" parameterType="string" resultType="com.mycom.myapp.info.dto.DongCodeDto">
+		select name 
+		  from dong_code 
+		 where gugun_name = #{gugunName}
+	</select>
+</mapper>

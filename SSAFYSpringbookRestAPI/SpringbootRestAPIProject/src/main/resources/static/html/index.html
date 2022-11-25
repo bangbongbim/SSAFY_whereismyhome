@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+
+  <link rel="stylesheet" href="../css/basic.css" />
+  <link rel="stylesheet" href="../css/index.css" />
+  <link rel="stylesheet" href="../css/header.css">
+  <link rel="stylesheet" href="../css/reset.css">
+  <link rel="stylesheet" href="../css/footer.css">
+  <!--  <script src="<%=contextPath%>/js/index.js"></script>-->
+
+  <!-- bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+    crossorigin="anonymous"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <!--custom -->
+  <script type="text/javascript"
+    src="//dapi.kakao.com/v2/maps/sdk.js?appkey=ac9eedff848a7c184a6a6818246bf6a5&libraries=services"></script>
+</head>
+
+<body>
+  <div id="container">
+    <header>
+      <div class="header-contents">
+        <div class="logo-box"> <a href="/"><img src="../img/logo.png" alt=""></a></div>
+        <div class="nav-box">
+          <nav>
+            <ul>
+              <li class="list-element"> <a href="#">실거래가조회</a> </li>
+              <li class="list-element" id="element-login"><a href="/login">로그인</a> </li>
+              <li class="list-element" id="element-register"><a href="/register">회원가입</a> </li>
+              <li class="list-element" id="element-userInfo"><a href="/modifyUserInfo">회원 정보</a></li>
+              <li class="list-element" id="element-logout"><a href="">로그아웃</a></li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+    </header>
+
+
+
+    <!-- 내정보 끝-->
+    <div class="modal fade" id="infoModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">내정보</h5>
+            <img src="../img/user/noProfile.png" id="myProfile" width="25px" style="margin-left:15px">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+          </div>
+          <div class="modal-body">
+            <div class="div-flex">
+              <div>이메일 : &nbsp; </div>
+              <div id="myEmail"></div>
+            </div>
+            <div class="div-flex">
+              <div>이름 : &nbsp;</div>
+              <div id="myName"></div>
+            </div>
+            <div class="div-flex">
+              <div>고유번호 : &nbsp;</div>
+              <div id="mySeq"></div>
+            </div>
+            <div class="div-flex">
+              <div>사용자 권한 코드 : &nbsp;</div>
+              <div id="myUserClsf"></div>
+            </div>
+            <div class="div-flex">
+              <div>아이디 생성일 : &nbsp;</div>
+              <div id="myregisterDate"></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" onclick="location.href = 'infoChange.jsp' ">내정보 수정</button>
+          </div>
+        </div>
+      </div>
+    </div>
+<<<<<<< HEAD
+  </div>
+  <!-- 내정보 끝-->
+
+  <!--이미지 시작-->
+  <div id="contentImg"></div>
+  <!--이미지 끝-->
+
+  <!-- 주소 선택 시작-->
+  <div class="selection_container d-flex justify-content-evenly align-items-center">
+    <a href="/dealByDong">
+      <button type="button" class="btn btn-secondary search-btn" id="searchDongBtn">법정동으로 찾기</button>
+    </a>
+    <a href="/dealByApart">
+      <button type="button" class="btn btn-secondary search-btn" id="searchApartBtn">아파트 명으로 찾기</button>
+    </a>
+  </div>
+  <!-- 주소 선택 끝-->
+
+  <!-- body 시작-->
+  <div id="body">
+    <div id="main-content">
+      <div class="row">
+        <div class="col-3">
+          <img src="../img/article.jpg" id="articleImg">
+        </div>
+        <div class="col-9">
+          <div class="row">
+            <div class="col-6 rank">
+              <h2 class="title">인기 건축 디자인</h2>
+              <ul>
+                <li><a href="#"> 미니멀리즘</a></li>
+                <li><a href="#"> 빌라 디자인</a></li>
+                <li><a href="#"> 전통 주택</a></li>
+                <li><a href="#"> 모던 하우스 디자인</a></li>
+                <li><a href="#"> 오두막집</a></li>
+                <li><a href="#"> 현대식 건물</a></li>
+              </ul>
+            </div>
+
+
+              <!-- 이벤트 -->
+              <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel" style="width: 500px">
+                <div class="carousel-inner" id="event-wrapper">
+                  <!-- 
+		        <div class="carousel-item active">
+		          <a href="../html/event1.html">
+		          	<img src="../img/no_img.png" class="d-block w-100" alt="no_img" />
+		          </a>
+		        </div>
+		        <div class="carousel-item">
+		          <a href="../html/event2.html">
+		          	<img src="../img/no_img.png" class="d-block w-100" alt="no_img" />
+		          </a>
+		        </div>
+		        <div class="carousel-item">
+		          <a href="../html/event3.html">
+		          	<img src="../img/no_img.png" class="d-block w-100" alt="no_img" />
+		          </a>
+		        </div>
+		         -->
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls"
+                  data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls"
+                  data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Next</span>
+                </button>
+              </div>
+              <!-- 이벤트 끝 -->
+
+
+              <!-- <div class="col-6 article" >
+                <h2 class="title">부동산 뉴스</h2>
+                <a href="https://www.mk.co.kr/news/realestate/view/2022/07/602976/">"가격 좀 싸졌네"하고 아무 집이나 덜컥 샀다간 낭패 - 매일경제</a><br>
+                  <h5 style="color: gray;">부동산 시장이 심상치 않다. 그동안 가격 급등에 대한 피로감으로 연초부터 주춤했던 서울 등 주요 지역 아파트 가격이 새 정부 출범 이후 좀 오르나 싶더니, 인플레이션과 대출금리 인상 우려 등으로 다시 밀리는 분위기다. 한국부동산원에 따르면 올 상반기 전국 아파트값은 0.11% 하락했고, 서울(-0.19%)과 수도권(-0.4%) 등 주요 지역 역시 부진한 모습...</h5>
+                </a>
+              </div> -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+      </div>
+      <!-- body 끝-->
+
+      <footer>
+        <div class="footer-contents">
+          <div class="footer-menu-box">
+            <a href="#">이용약관</a>
+            <a href="#">개인정보처리방침</a>
+          </div>
+
+          <div class="company-info-box">
+            <span>(주)살려줘 홈즈</span>
+            <span>대표 : 박싸피</span>
+            <span>부산시 강서구 12</span>
+            <span>TEL : 051-888-7878</span>
+            <span>FAX : 051-888-7118</span>
+            <span>MAIL : parkssafy@ssafy.com</span>
+          </div>
+
+          <p class="copyright">ⓒ HelpHomes Co. Ltd. All rights reserved.</p>
+        </div>
+      </footer>
+      <!-- 푸터 끝 -->
+      <script src="../js/header.js"></script>
+</body>
+
+</html>

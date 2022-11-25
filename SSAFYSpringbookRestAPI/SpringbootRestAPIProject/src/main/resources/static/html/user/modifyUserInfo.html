@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../../css/reset.css" />
+    <link rel="stylesheet" href="../../css/userInfo-view.css" />
+    <link rel="stylesheet" href="../../css/header.css">
+    <link rel="stylesheet" href="../../css/reset.css">
+    <title>회원정보수정</title>
+</head>
+
+<body>
+    <header>
+        <div class="header-contents">
+            <div class="logo-box"> <a href="/"><img src="../../img/logo.png" alt=""></a></div>
+            <div class="nav-box">
+                <nav>
+                    <ul>
+                        <li class="list-element"> <a href="#">실거래가조회</a> </li>
+                        <li class="list-element" id="element-login"><a href="/login">로그인</a> </li>
+                        <li class="list-element" id="element-register"><a href="/register">회원가입</a> </li>
+                        <li class="list-element" id="element-userInfo"><a href="/modifyUserInfo">회원 정보</a></li>
+                        <li class="list-element" id="element-logout">로그아웃</li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <div class="view-container">
+        <div class="view-contents">
+            <div class="view-box">
+                <p class="title">회원정보수정</p>
+                <p class="sub-title">이름</p>
+                <input type="text" id="name" value="김진호" />
+                <p class="sub-title">이메일</p>
+                <input type="email" id="email" value="dkdpdl12311@gmail.com" />
+                <p class="sub-title">비밀번호</p>
+                <input type="password" id="password" value="asdasd" />
+                <button id="modifyCompleteBtn">수정완료</button>
+                <button id="deleteUser">회원탈퇴</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        window.onload = function () {
+            const getUserInfo = async () => {
+                const url = "/user"
+
+                const options = {
+                    method: "GET"
+                }
+                try {
+                    let response = await fetch(url, options)
+                    let data = await response.json();
+                    console.log(data)
+
+                    document.querySelector("#name").value = data.userName
+                    document.querySelector("#email").value = data.userEmail
+                    document.querySelector("#password").value = data.userPassword
+                }
+                catch (error) {
+                    console.error(error)
+                }
+            }
+
+            const modifyUserInfo = async () => {
+                const userName = document.querySelector("#name").value;
+                const userEmail = document.querySelector("#email").value;
+                const userPassword = document.querySelector("#password").value;
+
+                const url = "/user"
+
+                const urlParams = new URLSearchParams({
+                    userName,
+                    userEmail,
+                    userPassword
+                })
+
+                const options = {
+                    method: "PUT",
+                    body: urlParams
+                }
+                try {
+                    let response = await fetch(url, options)
+                    let data = await response.json();
+
+                    if (data.result == "success") {
+                        location.href = "/"
+                    }
+
+                }
+                catch (error) {
+                    console.error(error)
+                }
+            }
+
+            const deleteUser = async () => {
+                const url = '/user'
+
+                const options = {
+                    method: "DELETE"
+                }
+
+                try {
+                    let response = await fetch(url, options)
+                    let data = await response.json()
+
+                    if (data.result == "success") {
+                        sessionStorage.removeItem("accessToken")
+                        location.href = "/";
+                    }
+                }
+                catch (error) {
+                    console.error(error)
+                }
+            }
+
+            getUserInfo();
+            document.querySelector("#modifyCompleteBtn").addEventListener('click', modifyUserInfo)
+            document.querySelector("#deleteUser").addEventListener('click', deleteUser)
+        }
+
+    </script>
+    <script src="../js/header.js"></script>
+
+</body>
+
+</html>

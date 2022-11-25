@@ -1,0 +1,41 @@
+.bg-black {
+  background-color: rgb(48, 47, 47);
+}
+
+.white-color {
+  color: white;
+}
+
+.navbar-brand {
+  font-size: 30px;
+  font-weight: 900;
+}
+
+.btn {
+  margin-left: 10px;
+}
+
+#footer-wrap {
+  height: 80px;
+  display: flex;
+  padding-left: 20px;
+}
+#footer-img {
+  background-image: url("../img/ssafy.png");
+  width: 80px;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.footer-text1 {
+  font-weight: 1000;
+  font-size: 7px;
+  margin: 5px 0px;
+}
+.footer-text2 {
+  color: gray;
+  font-size: 5px;
+  margin-bottom: 3px;
+}

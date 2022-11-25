@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="../css/reset.css" />
+  <link rel="stylesheet" href="../css/login.css" />
+  <link rel="stylesheet" href="../css/header.css">
+  <link rel="stylesheet" href="../css/reset.css">
+  <title>로그인</title>
+</head>
+
+<body>
+  <header>
+    <div class="header-contents">
+      <div class="logo-box"> <a href="/"><img src="../img/logo.png" alt=""></a></div>
+      <div class="nav-box">
+        <nav>
+          <ul>
+            <li class="list-element"> <a href="#">실거래가조회</a> </li>
+            <li class="list-element" id="element-login"><a href="/login">로그인</a> </li>
+            <li class="list-element" id="element-register"><a href="/register">회원가입</a> </li>
+            <li class="list-element" id="element-userInfo"><a href="/modifyUserInfo">회원 정보</a></li>
+            <li class="list-element" id="element-logout">로그아웃</li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+  <div class="login-container">
+    <div class="login-contents">
+      <div class="login-box">
+        <p class="login-title">회원가입</p>
+        <input type="text" id="name" placeholder="이름을 입력해주세요." />
+        <input type="email" id="email" placeholder="이메일을 입력해주세요." />
+        <input type="password" id="password" placeholder="비밀번호를 입력해주세요" />
+
+        <button id="registerBtn">회원가입</button>
+      </div>
+    </div>
+  </div>
+  <script>
+    window.onload = function () {
+
+
+      document.querySelector("#registerBtn").addEventListener("click", async () => {
+        const userName = document.querySelector("#name").value;
+        const userEmail = document.querySelector("#email").value;
+        const userPassword = document.querySelector("#password").value;
+
+        const url = "/register"
+        const urlParams = new URLSearchParams({
+          userName,
+          userPassword,
+          userEmail
+
+        })
+
+        const options = {
+          method: "POST",
+          body: urlParams
+        }
+
+        try {
+          let response = await fetch(url, options)
+          let data = await response.json();
+
+          console.log(data)
+          if (data.result == "success") {
+            location.href = "/";
+          }
+        } catch (error) {
+          console.error(error)
+        }
+      })
+    }
+  </script>
+  <script src="../js/header.js"></script>
+</body>
+
+</html>
