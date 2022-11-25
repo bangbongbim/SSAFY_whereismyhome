@@ -161,3 +161,5 @@ npm run serve -- --port 5500
 
 ## 추가 정보
 
+프로젝트에 대해 더 알고 싶으시면 Notion링크를 방문해 주세요 !
+[https://nebulous-angle-7cd.notion.site/71e66dd219814385b1e53fb9136dacec]
